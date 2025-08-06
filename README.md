@@ -1,4 +1,4 @@
-# 🎓 Canvas Scheduler
+# Scheduler
 
 A simple scheduling web app that pulls your **Canvas LMS assignments** and displays them in a:
 
@@ -9,7 +9,7 @@ No login required — just paste your **Canvas access token** to see your assign
 
 ---
 
-## 🚀 Features
+## Features
 
 - 📚 Pulls assignments and upcoming events via Canvas API
 - 📆 Calendar grid view of deadlines
@@ -19,7 +19,7 @@ No login required — just paste your **Canvas access token** to see your assign
 
 ---
 
-## 📦 Tech Stack
+## Tech Stack
 
 | Layer     | Stack                 |
 |-----------|-----------------------|
@@ -29,7 +29,7 @@ No login required — just paste your **Canvas access token** to see your assign
 
 ---
 
-## 🛠️ Local Setup
+## Local Setup
 
 ### 1. Clone the repo
 
@@ -119,7 +119,7 @@ canvas-scheduler/
 
 ---
 
-## ✅ Makefile (Optional)
+## Makefile (Optional)
 
 You can also use `make` to simplify commands:
 

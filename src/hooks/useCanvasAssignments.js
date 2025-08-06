@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function useCanvasAssignments() {
   const [assignments, setAssignments] = useState([]);
@@ -6,28 +6,39 @@ export default function useCanvasAssignments() {
   const token = localStorage.getItem("canvas_token");
 
   useEffect(() => {
-    if (!token) return;
-
     const fetchAssignments = async () => {
+      if (!token) {
+        setError("No Canvas token found.");
+        setLoading(false);
+        return;
+      }
+
       try {
-        const res = await fetch("http://localhost:8000/api/canvas/assignments", {
+        const res = await fetch("http://localhost:8000/api/canvas/getdummyassignments", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        const data = await res.json();
-        const upcoming = data
-          .filter(item => item.start_at)
-          .map(item => ({
-            title: item.title,
-            due: new Date(item.start_at),
-          }))
-          .sort((a, b) => a.due - b.due);
+        if (!res.ok) {
+          throw new Error(`API error: ${res.status}`);
+        }
 
-        setAssignments(upcoming);
+        const raw = await res.json();
+
+        // Normalize data for frontend usage
+        const normalized = raw.map((item) => ({
+          id: item.id,
+          title: item.name || item.title, // support both real and dummy data
+          due: item.due_at ? new Date(item.due_at) : null,
+          course: item.course_name || null,
+          submission: item.submission || null,
+        }));
+
+        setAssignments(normalized);
       } catch (err) {
         console.error("Failed to fetch assignments", err);
+        setError("Failed to fetch assignments");
       } finally {
         setLoading(false);
       }

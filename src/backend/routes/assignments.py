@@ -5,29 +5,50 @@ import os
 router = APIRouter()
 
 @router.get("/assignments")
-def get_assignments(authorization: str = Header(...)):
+def get_all_assignments(authorization: str = Header(...), only_unsubmitted: bool = False):
     token = authorization.replace("Bearer ", "")
     headers = {
         "Authorization": f"Bearer {token}"
     }
 
-    # You can change this to /assignments if you want more data
-    r = requests.get("https://canvas.instructure.com/api/v1/users/self/upcoming_events", headers=headers)
+    courses = requests.get("https://canvas.instructure.com/api/v1/courses?enrollment_state=active", headers=headers).json()
+    all_assignments = []
 
-    if not r.ok:
-        raise HTTPException(status_code=r.status_code, detail=r.text)
+    for course in courses:
+        course_id = course["id"]
+        url = f"https://canvas.instructure.com/api/v1/courses/{course_id}/assignments?include[]=submission"
+        res = requests.get(url, headers=headers)
 
-    return r.json()
+        if res.ok:
+            assignments = res.json()
 
-# @router.get("/assignments")
-# def get_assignments():
-#     return [
-#         {
-#             "title": "Dummy Assignment",
-#             "start_at": "2025-08-07T23:59:00Z"
-#         },
-#         {
-#             "title": "Mock Quiz",
-#             "start_at": "2025-08-10T12:00:00Z"
-#         }
-#     ]
+            if only_unsubmitted:
+                assignments = [a for a in assignments if not a.get("submission") or a["submission"]["workflow_state"] != "submitted"]
+
+            for a in assignments:
+                a["course_name"] = course["name"]
+                all_assignments.append(a)
+
+    return all_assignments
+
+
+@router.get("/getdummyassignments")
+def get_assignments():
+    return [
+        {
+            "id": 1,
+            "title": "Dummy Assignment 1",
+            "due": "2025-08-12T23:59:00Z",
+            "submission": None
+        },
+        {
+            "id": 2,
+            "title": "Submitted Assignment",
+            "due": "2025-08-10T12:00:00Z",
+            "submission": {
+                "workflow_state": "submitted",
+                "submitted_at": "2025-08-09T17:00:00Z"
+            }
+        }
+    ]
+

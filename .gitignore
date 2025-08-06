@@ -1,0 +1,10 @@
+# Frontend
+node_modules
+# Backend
+my-scheduler-app/backend/__pycache__/
+my-scheduler-app/backend/.venv/
+my-scheduler-app/backend/env/
+*.env
+*.pyc
+.DS_Store
+.vscode/

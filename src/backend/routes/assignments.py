@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Header, HTTPException
 import requests
 import os
+from datetime import datetime, timedelta
+
 
 router = APIRouter()
 
@@ -33,22 +35,32 @@ def get_all_assignments(authorization: str = Header(...), only_unsubmitted: bool
 
 
 @router.get("/getdummyassignments")
-def get_assignments():
+def get_dummy_assignments():
+    now = datetime.utcnow()
     return [
         {
             "id": 1,
-            "title": "Dummy Assignment 1",
-            "due": "2025-08-12T23:59:00Z",
+            "title": "Read Chapter 4",
+            "course_name": "World History",
+            "due": (now + timedelta(days=2)).isoformat() + "Z",
             "submission": None
         },
         {
             "id": 2,
-            "title": "Submitted Assignment",
-            "due": "2025-08-10T12:00:00Z",
+            "title": "Problem Set 5",
+            "course_name": "Calculus",
+            "due": (now + timedelta(days=4)).isoformat() + "Z",
             "submission": {
                 "workflow_state": "submitted",
-                "submitted_at": "2025-08-09T17:00:00Z"
+                "submitted_at": (now + timedelta(days=3)).isoformat() + "Z"
             }
+        },
+        {
+            "id": 3,
+            "title": "Research Paper Draft",
+            "course_name": "English Literature",
+            "due": (now + timedelta(days=6)).isoformat() + "Z",
+            "submission": None
         }
     ]
 

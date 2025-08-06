@@ -30,7 +30,7 @@ export default function useCanvasAssignments() {
         const normalized = raw.map((item) => ({
           id: item.id,
           title: item.name || item.title, // support both real and dummy data
-          due: item.due_at ? new Date(item.due_at) : null,
+          due: item.due ? new Date(item.due) : null,
           course: item.course_name || null,
           submission: item.submission || null,
         }));

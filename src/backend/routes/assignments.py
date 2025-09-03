@@ -2,6 +2,7 @@ from fastapi import APIRouter, Header, HTTPException
 import requests
 import os
 from datetime import datetime, timedelta
+import pytz
 
 
 router = APIRouter()
@@ -38,43 +39,31 @@ def get_all_assignments(authorization: str = Header(...), only_unsubmitted: bool
                 if not a.get("has_submitted_submissions", False)
             ]
 
+        #Sort assignments by due date, earliest first
         for a in assignments:
             a["course_name"] = course["name"]
             a["due"] = a.get("due_at")
             a["submission"] = a.get("has_submitted_submissions")
-            all_assignments.append(a)
+            # Ignore assignments without due dates and only include recent due dates (Current year)
+            if a["due"]:
+                due_date = datetime.fromisoformat(a["due"].replace("Z", "+00:00")).astimezone(pytz.timezone("America/Los_Angeles"))
+                if due_date.year == datetime.now().year:
+                    a["due"] = due_date.isoformat()
+                    all_assignments.append(a)
     # print(f"First assignment fetched: {all_assignments[0] if all_assignments else 'No assignments found'}")
     return all_assignments
 
+# Get assignments for a specific course
+@router.get("/assignments/{course_id}")
+def get_assignments_by_course(course_id: int, authorization: str = Header(...)):
+    token = authorization.replace("Bearer ", "")
+    headers = {"Authorization": f"Bearer {token}"}
 
+    url = f"https://canvas.instructure.com/api/v1/courses/{course_id}/assignments"
+    res = requests.get(url, headers=headers)
 
-@router.get("/getdummyassignments")
-def get_dummy_assignments():
-    now = datetime.utcnow()
-    return [
-        {
-            "id": 1,
-            "title": "Read Chapter 4",
-            "course_name": "World History",
-            "due": (now + timedelta(days=2)).isoformat() + "Z",
-            "submission": None
-        },
-        {
-            "id": 2,
-            "title": "Problem Set 5",
-            "course_name": "Calculus",
-            "due": (now + timedelta(days=4)).isoformat() + "Z",
-            "submission": {
-                "workflow_state": "submitted",
-                "submitted_at": (now + timedelta(days=3)).isoformat() + "Z"
-            }
-        },
-        {
-            "id": 3,
-            "title": "Research Paper Draft",
-            "course_name": "English Literature",
-            "due": (now + timedelta(days=6)).isoformat() + "Z",
-            "submission": None
-        }
-    ]
+    if not res.ok:
+        raise HTTPException(status_code=res.status_code, detail="Failed to fetch assignments")
 
+    assignments = res.json()
+    return assignments

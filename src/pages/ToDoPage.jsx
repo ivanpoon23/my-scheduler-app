@@ -65,7 +65,7 @@ export default function ToDoPage() {
                   <p className="text-xs text-green-600 mt-1">Submitted ✅</p>
                 )}
               </div>
-              <button className="text-sm text-green-600 hover:underline">✓ Mark Done</button>
+              <div className="text-sm text-gray-500">{item.course}</div>
             </li>
           ))}
         </ul>

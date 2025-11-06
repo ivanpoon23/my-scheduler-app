@@ -7,17 +7,17 @@ import CalendarPage from './pages/CalendarPage';
 const queryClient = new QueryClient();
 
 export default function App() {
-  const token = localStorage.getItem("canvas_token");
+  // const token = localStorage.getItem("canvas_token");
 
-  if (!token) {
-    return (
-      <div className="p-6 text-center text-red-600 font-semibold">
-        No Canvas token found. Please set it in localStorage manually:
-        <br />
-        <code>localStorage.setItem("canvas_token", "YOUR_TOKEN");</code>
-      </div>
-    );
-  }
+  // if (!token) {
+  //   return (
+  //     <div className="p-6 text-center text-red-600 font-semibold">
+  //       No Canvas token found. Please set it in localStorage manually:
+  //       <br />
+  //       <code>localStorage.setItem("canvas_token", "YOUR_TOKEN");</code>
+  //     </div>
+  //   );
+  // }
 
   return (
     <QueryClientProvider client={queryClient}>

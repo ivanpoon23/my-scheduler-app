@@ -1,27 +1,23 @@
 import React, { useState } from "react";
-import useCanvasAssignments from "../hooks/useCanvasAssignments";
+import { useDummyCanvasAssignments } from '../hooks/useCanvasAssignments';
 
 export default function CalendarPage() {
   const [filter, setFilter] = useState("unsubmitted");
-  const { data: assignments = [], isLoading } = useCanvasAssignments({
+  const { data: assignments = [], isLoading } = useDummyCanvasAssignments({
     onlyUnsubmitted: filter === "unsubmitted",
   });
 
   const today = new Date();
 
-  // Current month start & end
   const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const lastOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-  // Back up to the Sunday before (or same day if already Sunday)
   const startDate = new Date(firstOfMonth);
   startDate.setDate(startDate.getDate() - startDate.getDay());
 
-  // Forward to the Saturday after (or same day if already Saturday)
   const endDate = new Date(lastOfMonth);
   endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
 
-  // Generate all days from startDate → endDate
   const days = [];
   for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
     days.push(new Date(d));

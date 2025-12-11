@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-// import useCanvasAssignments, { markAssignmentDone } from '../hooks/useCanvasAssignments';
-import useCanvasAssignments from '../hooks/useCanvasAssignments';
+import useCanvasAssignments, { markAssignmentDone } from '../hooks/useCanvasAssignments';
+import { useDummyCanvasAssignments } from '../hooks/useCanvasAssignments';
 import { CalendarDays } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
+import { Navigate } from 'react-router-dom';
 
 export default function ToDoPage() {
   const [filter, setFilter] = useState('unsubmitted'); // "unsubmitted" | "all"
   const onlyUnsubmitted = filter === 'unsubmitted';
   const [doneAssignments, setDoneAssignments] = useState(new Set());
 
-  const { data: assignments = [], isLoading, error } = useCanvasAssignments({ onlyUnsubmitted });
+  const { data: assignments = [], isLoading, error } = useDummyCanvasAssignments({ onlyUnsubmitted });
+  console.log("Fetched assignments:", assignments);
 
   const handleToggleDone = async (title) => {
     setDoneAssignments((prev) => {
@@ -21,15 +23,15 @@ export default function ToDoPage() {
   };
 
   // Filter assignments based on tab
-  const filtered = assignments.filter((item) => {
-    const isSubmitted = item.has_submitted_submissions;
-    const isMarkedDone = doneAssignments.has(item.title);
+    const filtered = assignments.filter((item) => {
+      const isSubmitted = item.has_submitted_submissions;
+      const isMarkedDone = doneAssignments.has(item.title);
 
-    if (filter === "unsubmitted") {
-      return !isSubmitted && !isMarkedDone; 
-    }
-    return true; 
-  });
+      if (filter === "unsubmitted") {
+        return !isSubmitted && !isMarkedDone;
+      }
+      return true; 
+    });
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -59,10 +61,13 @@ export default function ToDoPage() {
       </div>
 
       {/* Loading / Error / Empty / List */}
+      {/* {If error navigate to login} */}
       {isLoading ? (
         <p className="text-gray-500">Loading assignments…</p>
       ) : error ? (
-        <p className="text-red-500">{error.message}</p>
+        // Console error for debugging
+        console.error(error) ||
+        <Navigate to="/login" replace />
       ) : filtered.length === 0 ? (
         <p className="text-gray-500">Finished All Assignments</p>
       ) : (
@@ -71,10 +76,10 @@ export default function ToDoPage() {
             {filtered.map((item, index) => {
               const isSubmitted = item.has_submitted_submissions;
               const isMarkedDone = doneAssignments.has(item.title);
-
+              
               return (
                 <motion.li
-                  key={item.name}
+                  key={item.title}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 200 }}

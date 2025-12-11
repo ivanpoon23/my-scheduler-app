@@ -4,15 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager # For reliable startup/shutdown
 
-# IMPORTANT: Import routers ONLY 
 from routes.assignments import router as assignments_router
 from routes.user_token import router as token_router
 from routes.auth import router as auth_router
 
-# Load environment variables FIRST
 load_dotenv()
 
-# --- Placeholder Lifespan Setup (Requires updates to your db.py) ---
 # Assuming these functions are defined in your db.py:
 # from db import get_mongo_client, close_db_connection 
 
@@ -33,7 +30,7 @@ load_dotenv()
 # app = FastAPI(lifespan=lifespan)
 # --- End Placeholder ---
 
-app = FastAPI() # If you skip lifespan, use this.
+app = FastAPI() 
 
 app.add_middleware(
     CORSMiddleware,
